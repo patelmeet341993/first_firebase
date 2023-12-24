@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "403008947046",
+    "project_id": "batch2023project-d5531",
+    "storage_bucket": "batch2023project-d5531.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:403008947046:android:0d05a9289b031d358cbea7",
+        "android_client_info": {
+          "package_name": "com.friendlyitsolution.demo.first_firebase"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCfCEvdRlUAVyR3-8jsy70qrPqZS5CEfNc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
