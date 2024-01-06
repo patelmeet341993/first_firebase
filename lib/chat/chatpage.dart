@@ -1,7 +1,9 @@
 import 'dart:collection';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:first_firebase/chat/splashscreen.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'constantdata.dart';
 
@@ -25,9 +27,9 @@ class _ChatPageState extends State<ChatPage> {
 
       data["msg"] = m;
       data["createdAt"] = FieldValue.serverTimestamp();
-      data["sender"] = Constants.userid;
-      data["senderName"] = Constants.username;
-
+      data["sender"] = Constants.user!.userid;
+      data["senderName"] = Constants.user!.name;
+      data["senderImage"] = Constants.user!.imgUrl;
       await firestore.collection("chat").doc().set(data);
       txtmsg.clear();
     }
@@ -121,15 +123,39 @@ class _ChatPageState extends State<ChatPage> {
         borderRadius: BorderRadius.circular(10),
        // color: map['sender']==Constants.userid?Colors.blue:Colors.grey,
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: map['sender']==Constants.userid?CrossAxisAlignment.end:CrossAxisAlignment.start,
+      child: Row(
+        mainAxisAlignment:map['sender']!=Constants.user!.userid? MainAxisAlignment.start:MainAxisAlignment.end,
         children: [
-          Text(
-            map["senderName"],
-            style: TextStyle(fontSize: 15),
+
+          if(map['sender']!=Constants.user!.userid)Container(
+              margin: EdgeInsets.only(right: 10),
+              width: 30,
+              height: 30,
+              child: ClipOval(child: Image.network(map["senderImage"]))),
+
+
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: map['sender']==Constants.user!.userid?CrossAxisAlignment.end:CrossAxisAlignment.start,
+            children: [
+
+
+
+              Text(
+                map["senderName"],
+                style: TextStyle(fontSize: 15),
+              ),
+              Text(map["msg"],style: TextStyle(fontSize: 20),),
+
+
+            ],
           ),
-          Text(map["msg"],style: TextStyle(fontSize: 20),),
+
+          if(map['sender']==Constants.user!.userid)Container(
+              margin: EdgeInsets.only(left: 10),
+              width: 30,
+              height: 30,
+              child: ClipOval(child: Image.network(Constants.user!.imgUrl)))
 
         ],
       ),
@@ -146,9 +172,14 @@ class _ChatPageState extends State<ChatPage> {
             SizedBox(
               width: 10,
             ),
-            Icon(
-              Icons.arrow_back_ios,
-              color: Colors.white,
+            Container(
+              height: 60,
+              width: 60,
+              child: ClipOval(
+                child: Image.network(
+                    Constants.user!.imgUrl
+                ),
+              ),
             ),
             SizedBox(
               width: 10,
@@ -157,13 +188,24 @@ class _ChatPageState extends State<ChatPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  Constants.username,
+                  Constants.user!.name,
                   style: TextStyle(fontSize: 20, color: Colors.white),
                 ),
-                Text(Constants.userid,
+                Text(Constants.user!.userid,
                     style: TextStyle(fontSize: 16, color: Colors.white))
               ],
             ),
+            Spacer(),
+            InkWell(
+                onTap: ()async{
+                  SharedPreferences shared=await SharedPreferences.getInstance();
+                  shared.clear();
+
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (ctx)=>SplashScreen()));
+
+
+                },
+                child: Icon(Icons.logout))
           ],
         ));
   }
