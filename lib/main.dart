@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:first_firebase/chat/chatpage.dart';
 import 'package:first_firebase/chat/signUp.dart';
 import 'package:first_firebase/chat/splashscreen.dart';
+import 'package:first_firebase/ln.dart';
 import 'package:flutter/material.dart';
 
 import 'firebase_options.dart';
