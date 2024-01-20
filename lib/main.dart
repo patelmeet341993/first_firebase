@@ -1,9 +1,13 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:first_firebase/chat/chatpage.dart';
+import 'package:first_firebase/chat/google_login.dart';
 import 'package:first_firebase/chat/signUp.dart';
 import 'package:first_firebase/chat/splashscreen.dart';
+import 'package:first_firebase/full_chat/myprovider.dart';
+import 'package:first_firebase/full_chat/splashpage.dart';
 import 'package:first_firebase/ln.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'firebase_options.dart';
 import 'first_page.dart';
@@ -15,7 +19,19 @@ void main()async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(const MyApp());
+
+
+
+  runApp(
+
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => MyProvider()),
+      ],
+      child: const MyApp(),
+    ),
+  );
+
 }
 
 class MyApp extends StatelessWidget {
@@ -31,7 +47,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: SplashScreen()
+      home: MySplashScreen()
     );
   }
 }
