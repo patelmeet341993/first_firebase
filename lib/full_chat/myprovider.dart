@@ -11,7 +11,7 @@ class MyProvider extends ChangeNotifier{
 
   void setUserModel(MyUserModel userModel,{bool isRefresh=true})
   {
-    _usermodel=usermodel;
+    _usermodel=userModel;
 
     if(isRefresh)notifyListeners();
   }

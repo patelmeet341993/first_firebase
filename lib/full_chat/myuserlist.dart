@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:first_firebase/full_chat/chatscreen.dart';
+import 'package:first_firebase/full_chat/groupchatscreen.dart';
 import 'package:first_firebase/full_chat/myprovider.dart';
 import 'package:first_firebase/full_chat/splashpage.dart';
 import 'package:flutter/material.dart';
@@ -45,6 +47,11 @@ class _MyUserListState extends State<MyUserList> {
       List<DocumentSnapshot> docs=value.docs;
 
       users.clear();
+
+
+      MyUserModel currentUser=Provider.of<MyProvider>(context,listen: false).usermodel!;
+
+      print("current user : ${currentUser.uid}");
 
       for(int i=0;i<docs.length;i++)
         {
@@ -105,33 +112,41 @@ class _MyUserListState extends State<MyUserList> {
 
   Widget userItem(MyUserModel user)
   {
-    return Column(
-      children: [
-        Container(
-          padding: EdgeInsets.all(10),
-          width: double.maxFinite,
-          child:Row(
-            children: [
-              Container(
-                height: 70,
-                width: 70,
-                child: ClipOval(
-                  child: Image.network(user.imgurl),
-                ),
-              ),
-              SizedBox(width: 20,),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+    return InkWell(
+      onTap: (){
+        Navigator.push(context, MaterialPageRoute(builder: (ctx) => MyChatPage(userModel: user)));
+
+      },
+      child: Container(
+        child: Column(
+          children: [
+            Container(
+              padding: EdgeInsets.all(10),
+              width: double.maxFinite,
+              child:Row(
                 children: [
-                  Text(user.name,style: TextStyle(fontWeight: FontWeight.w600,fontSize: 20),),
-                  Text(user.status,style: TextStyle(fontWeight: FontWeight.w500,fontSize: 14),),
+                  Container(
+                    height: 70,
+                    width: 70,
+                    child: ClipOval(
+                      child: Image.network(user.imgurl),
+                    ),
+                  ),
+                  SizedBox(width: 20,),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(user.name,style: TextStyle(fontWeight: FontWeight.w600,fontSize: 20),),
+                      Text(user.status,style: TextStyle(fontWeight: FontWeight.w500,fontSize: 14),),
+                    ],
+                  )
                 ],
-              )
-            ],
-          ),
+              ),
+            ),
+            Container(width: double.maxFinite,height: 1,color: Colors.grey,),
+          ],
         ),
-        Container(width: double.maxFinite,height: 1,color: Colors.grey,),
-      ],
+      ),
     );
   }
 
@@ -142,7 +157,10 @@ class _MyUserListState extends State<MyUserList> {
         backgroundColor: Colors.blue,
         leading: Icon(Icons.wechat),
         title: Text("My Chat Room"),
-        actions: [InkWell(onTap: () {}, child: Padding(
+        actions: [InkWell(onTap: () {
+          Navigator.push(context, MaterialPageRoute(builder: (ctx) => MyGroupChatPage()));
+
+        }, child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Icon(Icons.group),
         )),
