@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:first_firebase/full_chat/myprovider.dart';
@@ -7,8 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'MyUserModel.dart';
-class MyChatPage extends StatefulWidget {
 
+class MyChatPage extends StatefulWidget {
   final MyUserModel userModel;
 
   const MyChatPage({required this.userModel});
@@ -18,20 +19,76 @@ class MyChatPage extends StatefulWidget {
 }
 
 class _MyChatPageState extends State<MyChatPage> {
-
-
   TextEditingController txtmsg = TextEditingController();
 
-  List<Map<String, dynamic>> mylist = [];
-  ScrollController controller=ScrollController();
+  ScrollController controller = ScrollController();
 
   late MyProvider provider;
 
-  String laststatus="online";
+  String laststatus = "online";
+
+  String chatId = "";
+  late FirebaseFirestore firestore;
+  List<Map<String, dynamic>> mylist = [];
+
+  Future<String> getChatId() async {
+    String otherUserId = widget.userModel.uid;
+    String myUsrtId = FirebaseAuth.instance.currentUser!.uid;
+
+    String AB = myUsrtId + otherUserId;
+    String BA = otherUserId + myUsrtId;
+
+    DocumentSnapshot snapshot = await FirebaseFirestore.instance
+        .collection("personalChats")
+        .doc(AB)
+        .get();
+
+    if (snapshot.exists) {
+      return AB;
+    } else {
+      DocumentSnapshot snapshot1 = await FirebaseFirestore.instance
+          .collection("personalChats")
+          .doc(BA)
+          .get();
+
+      if (snapshot1.exists) {
+        return BA;
+      } else {
+        return AB;
+      }
+    }
+  }
+
+  Future<void> getMsg()async {
+
+
+    chatId=await getChatId();
+
+
+    firestore
+        .collection("personalChats").doc(chatId).collection("msgs")
+        .orderBy("createdAt")
+        .snapshots(includeMetadataChanges: true)
+        .listen((data) {
+      mylist.clear();
+      for (int i = 0; i < data.docs.length; i++) {
+        QueryDocumentSnapshot d = data.docs[i];
+        Map<String, dynamic> mydata = d.data() as Map<String, dynamic>;
+        mylist.add(mydata);
+      }
+
+      controller.jumpTo(controller.position.maxScrollExtent);
+      setState(() {});
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+    firestore = FirebaseFirestore.instance;
+    Future.delayed(Duration(milliseconds: 500), () {
+      getMsg();
+    });
 
   }
 
@@ -45,9 +102,6 @@ class _MyChatPageState extends State<MyChatPage> {
       ),
     );
   }
-
-
-
 
   Widget _mainBody() {
     return Column(
@@ -79,17 +133,11 @@ class _MyChatPageState extends State<MyChatPage> {
             children: [
               Expanded(
                   child: TextField(
-                    onChanged: (val){
-
-
-
-                    },
-                    controller: txtmsg,
-                  )),
+                onChanged: (val) {},
+                controller: txtmsg,
+              )),
               InkWell(
-                onTap: () {
-
-                },
+                onTap: () {},
                 child: Container(
                   height: 50,
                   width: 50,
@@ -150,7 +198,7 @@ class _MyChatPageState extends State<MyChatPage> {
                 width: 30,
                 height: 30,
                 child:
-                ClipOval(child: Image.network(provider.usermodel!.imgurl)))
+                    ClipOval(child: Image.network(provider.usermodel!.imgurl)))
         ],
       ),
     );
@@ -169,7 +217,10 @@ class _MyChatPageState extends State<MyChatPage> {
                 onTap: () {
                   Navigator.pop(context);
                 },
-                child: Icon(Icons.arrow_back_ios_new,color: Colors.white,)),
+                child: Icon(
+                  Icons.arrow_back_ios_new,
+                  color: Colors.white,
+                )),
             SizedBox(
               width: 15,
             ),
@@ -180,7 +231,9 @@ class _MyChatPageState extends State<MyChatPage> {
               width: 45,
               padding: EdgeInsets.all(1),
               child: ClipOval(
-                child: Image.network(widget.userModel.imgurl,),
+                child: Image.network(
+                  widget.userModel.imgurl,
+                ),
               ),
             ),
             SizedBox(
@@ -200,6 +253,4 @@ class _MyChatPageState extends State<MyChatPage> {
           ],
         ));
   }
-
-
 }

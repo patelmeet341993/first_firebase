@@ -25,10 +25,10 @@ class _SignupPageState extends State<SignupPage> {
   TextEditingController txtid = TextEditingController();
   TextEditingController txtpin = TextEditingController();
   String? downloadUrl;
-
+  File? imgFile;
   String imagelabel = "No image Selected";
 
-  File? imgFile;
+
 
   @override
   void initState() {
